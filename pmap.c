@@ -141,9 +141,9 @@ void rowhammer(unsigned long* buf, int* index) {
     int b_end_pg = b_start+64;
     
     int a_start = index[a_start_pg];
-    int a_end_pg = index[a_end_pg];
+    int a_end = index[a_end_pg];
     int b_start = index[b_start_pg];
-    int b_end_pg = index[b_end_pg];
+    int b_end = index[b_end_pg];
     
     
     
