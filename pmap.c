@@ -24,7 +24,7 @@
 // Pages to allocate
 #define PG_COUNT        8192
 
-PAGEMAP_LENGTH 8
+#define PAGEMAP_LENGTH 8
 
 #define BUF_SIZE_DW         (PAGE_SIZE/VAL_SIZE)*PG_COUNT
 #define BUF_SIZE_BYTE       PAGE_SIZE*PG_COUNT
@@ -112,7 +112,7 @@ int main(){
     pg_size[i]=0;
   }
 
-  for(i = 0; i < BUF_SIZE; i++){
+  for(i = 0; i < BUF_SIZE_DW; i++){
     
     unsigned long pfn = get_page_frame_number_of_address((void*)&buf[i]);
     unsigned long addr = (unsigned long) &buf[i];
