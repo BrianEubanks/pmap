@@ -136,9 +136,9 @@ void rowhammer(unsigned long* buf, int* index) {
     
     // Page Index
     int a_start_pg = 962;
-    int a_end_pg = a_start+64;
+    int a_end_pg = a_start_pg+64;
     int b_start_pg = 1090;
-    int b_end_pg = b_start+64;
+    int b_end_pg = b_start_pg+64;
     
     int a_start = index[a_start_pg];
     int a_end = index[a_end_pg];
