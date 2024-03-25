@@ -133,10 +133,19 @@ int sweep(unsigned long* buf){
 }
 
 void rowhammer(unsigned long* buf, int* index) {
-    int a_start = 962;
-    int a_end = a_start+64;
-    int b_start = 1090;
-    int b_end = b_start+64;
+    
+    // Page Index
+    int a_start_pg = 962;
+    int a_end_pg = a_start+64;
+    int b_start_pg = 1090;
+    int b_end_pg = b_start+64;
+    
+    int a_start = index[a_start_pg];
+    int a_end_pg = index[a_end_pg];
+    int b_start = index[b_start_pg];
+    int b_end_pg = index[b_end_pg];
+    
+    
     
     unsigned long addra;
     unsigned long addrb;
