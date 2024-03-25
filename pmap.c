@@ -100,8 +100,55 @@ unsigned long getPhysAddr(unsigned long pfn, unsigned long addr ) {
   return physical_addr;
 }
 
-void rowhammer(unsigned long* buf) {
+void hammer(unsigned long addra, unsigned long addrb) {
+    unsigned long temp = -INIT_BIT;
+    // hammer using DC CVAC + STR without DSB
+    for (j = 0; j < HAMMER_ROUND; ++j) {
+      asm volatile(
+        "ldr %2, [%0]\n\t"
+        "ldr %2, [%1]\n\t"
+        "dc cvac, %0\n\t"
+        "dc cvac, %1\n\t"
+        //"dsb 0xb"
+        ::"r" (addra), "r" (addrb), "r" (temp)
+      );
+    }
+    return count;
+}
+
+int sweep(unsigned long* buf){
+    printf("sweepstart\n");
+    int count = 0;
+    for(int i = 0; i < BUF_SIZE_DW; i++){
+        if (buf[i] != -INIT){
+            printf("buf:i = 0x%lx",buf[i]);
+            count++;
+        }
+    }
+    printf("sweepend count: %d\n",count);
+    return count;
+}
+
+void rowhammer(unsigned long* buf, unsigned long* index) {
+    int a_start = 962;
+    int a_end = a_start+64;
+    int b_start = 1090;
+    int b_end = b_start+64;
     
+    unsigned long addra;
+    unsigned long addrb;
+    
+    int cnt = 0;
+    
+    for(int a = a_start; a < a_end; a++){
+        addra = buf[index[a]];
+        for (int b = b_start; b < b_end; b++){
+            addrb = buf[index[b]];
+            hammer(addra,addrb);
+        }
+        cnt+=sweep(buf);
+    }
+    printf("total count: %d",cnt);
 }
 
 
@@ -132,7 +179,6 @@ int main(){
     if (pg_tab[p] != pfn){
       if (i == 0) {
         pg_tab[0]=pfn;
-        pg_size[0]++;
       } else {
         p++;
         
@@ -151,6 +197,8 @@ int main(){
     printf("pg%d: 0x%x, size: %lu, index: %d\n",i,pg_tab[i],pg_size[i],pg_index[i]);
   }
 
+    
+  rowhammer(buf,pg_index);
 
 
   free(buf);
