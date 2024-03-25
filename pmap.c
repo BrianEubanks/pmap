@@ -5,36 +5,47 @@
 #include <unistd.h>
 #include <sys/user.h>
 
-#define CHUNK_SIZE 0x1000000
-#define PAGE_SIZE4  4096
-#define PAGE_SHIFT4 12
-#define PAGE_SIZE5 16384
-#define PAGE_SHIFT5 14
-#define PAGE_SIZE  (getpagesize())
-#define VAL_SIZE      sizeof(unsigned long)
-#define PAGEMAP_LENGTH 8
-#define PG_COUNT 8192
-#define BUF_SIZE (PAGE_SIZE/VAL_SIZE)*PG_COUNT
 
-#define PAGE_SHIFT PAGE_SHIFT5
+
+// Page size 4K Bytes
+#define PAGE_SIZE4      4096
+#define PAGE_SHIFT4     12
+
+// Page size 16K Bytes
+#define PAGE_SIZE5      16384
+#define PAGE_SHIFT5     14
+
+#define PAGE_SIZE   (getpagesize())
+#define PAGE_SHIFT  PAGE_SHIFT4     //Assume 4K
+
+// Double word aligned
+#define VAL_SIZE        sizeof(unsigned long)
+
+// Pages to allocate
+#define PG_COUNT        8192
+
+PAGEMAP_LENGTH 8
+
+#define BUF_SIZE_DW         (PAGE_SIZE/VAL_SIZE)*PG_COUNT
+#define BUF_SIZE_BYTE       PAGE_SIZE*PG_COUNT
+
 
 #define INIT 1
 
-//offset = (unsigned long)addr / PAGE_SIZE * PAGEMAP_LENGTH
 
 unsigned long* createBuffer(void) {
-	size_t buf_size = BUF_SIZE;
-        buf_size = PAGE_SIZE*PG_COUNT;
+	size_t buf_size = BUF_SIZE_BYTE;
 
 	//printf("pg: %x\n",PAGE_SIZE4);
 	//printf("pg: %x\n",PAGE_SIZE5);
-	printf("syscall pgsz: 0x%x\n",getpagesize());
 	printf("PgSz: 0x%x\n",PAGE_SIZE);
+    printf("PgSft: 0x%x\n",PAGE_SHIFT);
 	printf("ValSz: 0x%x\n",VAL_SIZE);
-	printf("bufsize: 0x%x\n",buf_size);
-        printf("pgsifht: 0x%x\n",PAGE_SHIFT);
+	printf("BufSzB: 0x%x\n",buf_size);
+    printf("BufSzL: 0x%x\n",BUF_SIZE_DW);
+        
    // Allocate some memory to manipulate
-   unsigned long *buffer = (unsigned long*) malloc(PAGE_SIZE*PG_COUNT);
+   unsigned long *buffer = (unsigned long*) malloc(buf_size);
    if(buffer == NULL) {
       //fprintf(stderr, "Failed to allocate memory for buffer\n");
       printf("failed to allocate memory for buffer\n");
@@ -53,7 +64,7 @@ unsigned long* createBuffer(void) {
 
    // Add some data to the memory
    //strncpy(buffer, ORIG_BUFFER, strlen(ORIG_BUFFER));
-   for (int i = 0; i < BUF_SIZE;i++){ 
+   for (int i = 0; i < BUF_SIZE_DW;i++){
    	//buffer[i]=0xDEAD;
 	buffer[i]= -INIT;
    }
