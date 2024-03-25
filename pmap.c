@@ -108,8 +108,8 @@ void hammer(unsigned long addra, unsigned long addrb) {
     // hammer using DC CVAC + STR without DSB
     for (int j = 0; j < HAMMER_ROUND; ++j) {
       asm volatile(
-        "str %2, [%0]\n\t"
-        "str %2, [%1]\n\t"
+        "ldr %2, [%0]\n\t"
+        "ldr %2, [%1]\n\t"
         "dc cvac, %0\n\t"
         "dc cvac, %1\n\t"
         //"dsb 0xb"
@@ -145,11 +145,11 @@ void rowhammer(unsigned long* buf, int* index) {
     
     for(int a = a_start; a < a_end; a++){
         printf("a: %d: ",a);
-        addra = buf[index[a]];
+        addra = buf[a];
         printf("addr: 0x%lx\n",addra);
         for (int b = b_start; b < b_end; b++){
             printf("b: %d: ",b);
-            addrb = buf[index[b]];
+            addrb = buf[b];
             hammer(addra,addrb);
             printf("addr: 0x%lx\n",addrb);
 
