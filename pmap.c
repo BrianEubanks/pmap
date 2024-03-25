@@ -22,7 +22,7 @@
 #define VAL_SIZE        sizeof(unsigned long)
 
 // Pages to allocate
-#define PG_COUNT        8192
+#define PG_COUNT        4096
 
 #define PAGEMAP_LENGTH 8
 
@@ -99,6 +99,12 @@ unsigned long getPhysAddr(unsigned long pfn, unsigned long addr ) {
   unsigned long physical_addr = (pfn << PAGE_SHIFT) + offset;
   return physical_addr;
 }
+
+void rowhammer(unsigned long* buf) {
+    
+}
+
+
 int main(){
   unsigned long* buf = createBuffer();
   int i = 0;
@@ -107,36 +113,42 @@ int main(){
 
   unsigned long pg_size[tab_size];
   unsigned long pg_tab[tab_size];
+  int pg_index[tab_size];
   for(i = 0; i < tab_size; i++){
     pg_tab[i]=0;
     pg_size[i]=0;
+    pg_index[i]=0;
   }
 
   for(i = 0; i < BUF_SIZE_DW; i++){
     
     unsigned long pfn = get_page_frame_number_of_address((void*)&buf[i]);
     unsigned long addr = (unsigned long) &buf[i];
-    printf("buf%d: 0x%x\n",i,buf[i]);
-    printf("pfn: 0x%lx\n",pfn);
-    printf("addr: 0x%lx\n",&buf[i]);
-    printf("phys_addr: 0x%lx\n", getPhysAddr(pfn,addr));
+    printf("buf:%d: 0x%x\n",i,buf[i]);
+    printf(" pfn: 0x%lx\n",pfn);
+    printf(" addr: 0x%lx\n",&buf[i]);
+    printf(" phys_addr: 0x%lx\n", getPhysAddr(pfn,addr));
+      
     if (pg_tab[p] != pfn){
       if (i == 0) {
         pg_tab[0]=pfn;
         pg_size[0]++;
       } else {
         p++;
+        
         if (p >= tab_size) {
           printf("p greater than tabsize\n");
         }
+          
         pg_tab[p]=pfn;
+        pg_index[p]=i;
       }
     }
     pg_size[p]++;
   }
 
   for(i = 0; i < tab_size; i++){
-    printf("pg%d: 0x%x, size: %lu\n",i,pg_tab[i],pg_size[i]);
+    printf("pg%d: 0x%x, size: %lu, index: %d\n",i,pg_tab[i],pg_size[i],pg_index[i]);
   }
 
 
