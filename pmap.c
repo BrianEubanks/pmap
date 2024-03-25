@@ -124,7 +124,7 @@ int sweep(unsigned long* buf){
     int count = 0;
     for(int i = 0; i < BUF_SIZE_DW; i++){
         if (buf[i] != -INIT){
-            printf("buf:i = 0x%lx",buf[i]);
+            printf("buf:i = 0x%lx\n",buf[i]);
             count++;
         }
     }
@@ -145,14 +145,16 @@ void rowhammer(unsigned long* buf, int* index) {
     
     for(int a = a_start; a < a_end; a++){
         printf("a: %d: ",a);
-        addra = buf[a];
+        addra = (unsigned long) &buf[a];
         printf("addr: 0x%lx\n",addra);
         for (int b = b_start; b < b_end; b++){
             printf("b: %d: ",b);
-            addrb = buf[b];
-            hammer(addra,addrb);
+            addrb = (unsigned long) &buf[b];
             printf("addr: 0x%lx\n",addrb);
-
+            
+            printf("hammer start:");
+            hammer(addra,addrb);
+            printf("done\n");
         }
         cnt+=sweep(buf);
     }
