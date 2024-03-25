@@ -32,6 +32,8 @@
 
 #define INIT 1
 
+#define HAMMER_ROUND 1000
+
 
 unsigned long* createBuffer(void) {
 	size_t buf_size = BUF_SIZE_BYTE;
@@ -101,9 +103,10 @@ unsigned long getPhysAddr(unsigned long pfn, unsigned long addr ) {
 }
 
 void hammer(unsigned long addra, unsigned long addrb) {
-    unsigned long temp = -INIT_BIT;
+
+    unsigned long temp = -INIT;
     // hammer using DC CVAC + STR without DSB
-    for (j = 0; j < HAMMER_ROUND; ++j) {
+    for (int j = 0; j < HAMMER_ROUND; ++j) {
       asm volatile(
         "ldr %2, [%0]\n\t"
         "ldr %2, [%1]\n\t"
@@ -113,7 +116,7 @@ void hammer(unsigned long addra, unsigned long addrb) {
         ::"r" (addra), "r" (addrb), "r" (temp)
       );
     }
-    return count;
+
 }
 
 int sweep(unsigned long* buf){
@@ -129,7 +132,7 @@ int sweep(unsigned long* buf){
     return count;
 }
 
-void rowhammer(unsigned long* buf, unsigned long* index) {
+void rowhammer(unsigned long* buf, int* index) {
     int a_start = 962;
     int a_end = a_start+64;
     int b_start = 1090;
